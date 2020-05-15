@@ -7,7 +7,7 @@
 #include "HTMLPages/root.h"
 
 bool Router::isAuthenticated(AsyncWebServerRequest *request) {
-    DEBUG_PRINTLN("Enter isAuthenticated");
+    // DEBUG_PRINTLN("Enter isAuthenticated");
 
     if (request->hasHeader("Cookie")) {
         String cookie = request->header("Cookie");
@@ -95,12 +95,12 @@ void Router::handleLoginGet(AsyncWebServerRequest *request) {
 }
 
 void Router::taskOpen(void *param) {
-    MotorController::openDoor();
+    MotorController::setDoorState(DoorState::DOOROPEN);
     vTaskDelete(NULL);
 }
 
 void Router::taskClose(void *param) {
-    MotorController::closeDoor();
+    MotorController::setDoorState(DoorState::DOORCLOSED);
     vTaskDelete(NULL);
 }
 
@@ -109,7 +109,7 @@ void Router::handleOpenDoor(AsyncWebServerRequest *request) {
 
     if (!isAuthenticated(request)) return;
 
-    if (MotorController::areWebCommandsAllowed()) {
+    if (!MotorController::isMoving()) {
         request->send(200);
         xTaskCreatePinnedToCore(taskOpen, "taskOpen", 4096, NULL, 1, NULL, 1);
         return;
@@ -123,7 +123,7 @@ void Router::handleCloseDoor(AsyncWebServerRequest *request) {
 
     if (!isAuthenticated(request)) return;
 
-    if (MotorController::areWebCommandsAllowed()) {
+    if (!MotorController::isMoving()) {
         xTaskCreatePinnedToCore(taskClose, "taskClose", 4096, NULL, 1, NULL, 1);
         request->send(200);
         return;
@@ -140,50 +140,51 @@ void Router::handleStop(AsyncWebServerRequest *request) {
 
 void Router::handleAllowStart(AsyncWebServerRequest *request) {
     if (!isAuthenticated(request)) return;
-    //  FIXME: Buttons for stopping then starting again
     MotorController::setAllowedToMove(true);
 }
 
 void Router::getDoorState(AsyncWebServerRequest *request) {
     if (!isAuthenticated(request)) return;
 
-    DoorStatus State = MotorController::getDoorState();
+    DoorState State = MotorController::getDoorState();
     String content = "";
     /**
      * All Possible return states:
      * ::DOOROPEN
      * ::DOOROPENING
-     * ::DOORCLOSED
+     * ::DOORCLOSED 
      * ::DOORCLOSING
      * ::DOORFLOATING
      * ::DOORERROR
      * 
      * Example end result string:
-     *  { "status": "DOOROPEN", "isMoving": true }
+     *  { "status": "DOOROPEN", "isMoving": true, "allowedToMove": true }
      */
 
     content += "{\"status\": \"";
-    if (State == DoorStatus::DOOROPEN) {
+    if (State == DoorState::DOOROPEN) {
         content += "DOOROPEN";
     }
-    if (State == DoorStatus::DOOROPENING) {
+    if (State == DoorState::DOOROPENING) {
         content += "DOOROPENING";
     }
-    if (State == DoorStatus::DOORCLOSED) {
+    if (State == DoorState::DOORCLOSED) {
         content += "DOORCLOSED";
     }
-    if (State == DoorStatus::DOORCLOSING) {
+    if (State == DoorState::DOORCLOSING) {
         content += "DOORCLOSING";
     }
-    if (State == DoorStatus::DOORFLOATING) {
+    if (State == DoorState::DOORFLOATING) {
         content += "DOORFLOATING";
     }
-    if (State == DoorStatus::ERROR) {
+    if (State == DoorState::ERROR) {
         content += "DOORERROR";
     }
 
     content += "\",\"isMoving\": ";
-    content += MotorController::isMoving() ? "true}" : "false}";
+    content += MotorController::isMoving() ? "true" : "false";
+    content += ",\"allowedToMove\": ";
+    content += MotorController::isAllowedToMove() ? "true}" : "false}";
 
     request->send(200, "application/json", content);
 }

@@ -43,7 +43,7 @@ const uint16_t WIFI_HOW_OFTEN_TO_CHECK_WIFI_STILL_RUNNING_SECONDS = 120;   // Ho
 const uint16_t INDICATOR_SHORT_BLINK_TIME_MS = 200;                        // How long the LED should be lit up for A short blink
 const uint16_t INDICATOR_LONG_BLINK_TIME_MS = 1000;                        // How long the LED should be lit up for A long blink
 const uint16_t INDICATOR_WAIT_BETWEEN_NONIMPORTANT_BLINK_CODES_MS = 5000;  // Wait time between nonimportant codes being blinked (Normal Operation)
-const uint16_t INDICATOR_WAIT_BETWEEN_IMPORTANT_BLINK_CODES_MS = 1000;     // Wait time between important codes being blinked (Error's)
+const uint16_t INDICATOR_WAIT_BETWEEN_IMPORTANT_BLINK_CODES_MS = 750;      // Wait time between important codes being blinked (Error's)
 
 #ifdef OTA_UPLOAD
 const uint16_t ARDUINO_OTA_PORT = 3232;  // Arduino OTA Port (3232 is the standard default)
@@ -65,14 +65,17 @@ RTC_DATA_ATTR bool RTC_ShouldHostOwnNetwork = false;
 
 // Outputs
 const uint8_t hBridgeOpen = 32;
-const uint8_t hBridgeRelay = 25;
 const uint8_t hBridgeClose = 33;
 const uint8_t indicatorPin = 21;
 
 // Inputs
-/* Don't Forget Interupts Need To Be On RTC_GPIO Pins */
+/* 
+    Don't Forget Interupts Need To Be On RTC_GPIO Pins
+    And outsideESPWakeup needs to be on a Touch GPIO Pin
+    if You're using it as a touch button.
+ */
 const uint8_t insideDoorOpen = 34;
-const uint8_t outsideESPWakeup = 35;
+const uint8_t outsideESPWakeup = 13;
 const uint8_t limitSwitchOpen = 22;
 const uint8_t limitSwitchClose = 23;
 const uint8_t doorReedSwitch = 14;
@@ -82,13 +85,11 @@ void setup() {
 
     pinMode(hBridgeOpen, OUTPUT);
     pinMode(hBridgeClose, OUTPUT);
-    pinMode(hBridgeRelay, OUTPUT);
     pinMode(indicatorPin, OUTPUT);
 
     // Just to be safe
     digitalWrite(hBridgeOpen, LOW);
     digitalWrite(hBridgeClose, LOW);
-    digitalWrite(hBridgeRelay, LOW);
 
     pinMode(insideDoorOpen, INPUT_PULLDOWN);
     pinMode(limitSwitchClose, INPUT_PULLUP);
@@ -147,7 +148,7 @@ void setup() {
     server.on("/opendoor", HTTP_GET | HTTP_POST, Router::handleOpenDoor);
     server.on("/closedoor", HTTP_GET | HTTP_POST, Router::handleCloseDoor);
     server.on("/getdoorstate", HTTP_GET, Router::getDoorState);
-    // TODO: add hard stop route / buttons
+    server.on("/allowstart", HTTP_GET | HTTP_POST, Router::handleAllowStart);
     server.on("/stop", HTTP_GET | HTTP_POST, Router::handleStop);
     server.onNotFound(Router::handleNotFound);
     server.begin();

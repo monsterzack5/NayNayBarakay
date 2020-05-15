@@ -17,6 +17,7 @@ class Indicator {
     static void NORMALOPERATION_TASK(void*);
     static void HOSTINGOWNWIFI_TASK(void*);
     static void DOORSTATECHANGING_TASK(void*);
-    static void DOORNOTSHUTWITHREED_TASK(void*);
+    static void DOORERROR_TASK(void*);
+    static void DOOROPENINGFROMINSIDE_TASK(void*);
     static void NONE_TASK(void*);
 };

@@ -17,7 +17,6 @@ extern const char* AUTH_LOGIN_USERNAME;
 extern const char* AUTH_LOGIN_PASSWORD;
 extern const char* AUTH_COOKIE_NAME;
 extern const uint8_t hBridgeOpen;
-extern const uint8_t hBridgeRelay;
 extern const uint8_t hBridgeClose;
 extern const uint8_t insideDoorOpen;
 extern const uint8_t outsideESPWakeup;

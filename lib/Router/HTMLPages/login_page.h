@@ -2,6 +2,10 @@
 
 const char LOGIN_PAGE[] PROGMEM = R"=====(
 <html>
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+</head>
 <body>
     <form action='/login' method='POST'>Please Sign In First<br>
         "User:<input type='text' name='USERNAME' placeholder='username'><br>

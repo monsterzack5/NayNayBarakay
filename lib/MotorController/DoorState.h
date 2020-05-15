@@ -1,6 +1,6 @@
 #pragma once
 
-enum class DoorStatus : uint8_t {
+enum class DoorState : uint8_t {
     ERROR,
     DOOROPEN,
     DOOROPENING,

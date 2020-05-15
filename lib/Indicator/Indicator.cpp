@@ -53,9 +53,12 @@ TaskFunction_t Indicator::getTaskFromIndiactorState(IndicatorState state) {
         case IndicatorState::DOORSTATECHANGING:
             DEBUG_PRINTLN("Trying to indicate: DOORSTATECHANING");
             return DOORSTATECHANGING_TASK;
-        case IndicatorState::DOORNOTSHUTWITHREED:
-            DEBUG_PRINTLN("Trying to indicate: DOORNOTSHUTWITHREED");
-            return DOORNOTSHUTWITHREED_TASK;
+        case IndicatorState::DOORERROR:
+            DEBUG_PRINTLN("Trying to indicate: DOORERROR");
+            return DOORERROR_TASK;
+        case IndicatorState::DOOROPENINGFROMINSIDE:
+            DEBUG_PRINTLN("Trying to indicate: DOOROPENINGFROMINSIDE");
+            return DOOROPENINGFROMINSIDE_TASK;
         case IndicatorState::NONE:
             DEBUG_PRINTLN("Trying to indicate: NONE");
             return NONE_TASK;
@@ -115,11 +118,29 @@ void Indicator::DOORSTATECHANGING_TASK(void* args) {
     }
 }
 
-void Indicator::DOORNOTSHUTWITHREED_TASK(void* args) {
+void Indicator::DOORERROR_TASK(void* args) {
     while (true) {
         digitalWrite(indicatorPin, HIGH);
         // We delay here so we don't starve core 0 of cycles
         vTaskDelay(portMAX_DELAY);
+    }
+}
+
+// 2 short blinks
+void Indicator::DOOROPENINGFROMINSIDE_TASK(void* args) {
+    while (true) {
+        digitalWrite(indicatorPin, HIGH);
+        delay(INDICATOR_SHORT_BLINK_TIME_MS);
+        digitalWrite(indicatorPin, LOW);
+        delay(INDICATOR_SHORT_BLINK_TIME_MS);
+        digitalWrite(indicatorPin, HIGH);
+        delay(INDICATOR_SHORT_BLINK_TIME_MS);
+        digitalWrite(indicatorPin, LOW);
+        delay(INDICATOR_SHORT_BLINK_TIME_MS);
+        digitalWrite(indicatorPin, HIGH);
+        delay(INDICATOR_SHORT_BLINK_TIME_MS);
+        digitalWrite(indicatorPin, LOW);
+        delay(INDICATOR_WAIT_BETWEEN_IMPORTANT_BLINK_CODES_MS);
     }
 }
 
