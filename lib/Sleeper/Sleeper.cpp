@@ -7,7 +7,7 @@
 
 void Sleeper::checkWiFiLoop() {
     if (RTC_WiFiRetriesCount > WiFi_TRY_TO_CONNECT_THEN_SLEEP_LIMIT) {
-        DEBUG_PRINTLN("Exausted retries, Going into long Deep Sleep");
+        DEBUG_PRINTLN("Exhausted retries, Going into long Deep Sleep");
         RTC_WiFiRetriesCount = 0;
         deepSleepSeconds(SLEEPER_LONG_DEEP_SLEEP_SECONDS);
     }

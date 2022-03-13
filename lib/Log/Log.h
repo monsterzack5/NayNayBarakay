@@ -1,6 +1,6 @@
 #pragma once
 /* Comment this out to fully disable Serial.print statements */
-#define DEBUG 1
+// #define DEBUG 1
 #ifdef DEBUG
 #define DEBUG_PRINT(x) Serial.print(x)
 #define DEBUG_PRINTLN(x) Serial.println(x)

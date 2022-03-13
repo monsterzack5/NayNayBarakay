@@ -5,6 +5,7 @@
 
 #include "HTMLPages/login_page.h"
 #include "HTMLPages/root.h"
+#include "HTMLPages/manifest.h"
 
 bool Router::isAuthenticated(AsyncWebServerRequest *request) {
     // DEBUG_PRINTLN("Enter isAuthenticated");
@@ -104,6 +105,11 @@ void Router::taskClose(void *param) {
     vTaskDelete(NULL);
 }
 
+void Router::taskOpenThenClose(void *param) {
+    MotorController::changeDoorStateAndWaitForDoor();
+    vTaskDelete(NULL);
+}
+
 void Router::handleOpenDoor(AsyncWebServerRequest *request) {
     DEBUG_PRINTLN("Enter handleDoorOpen");
 
@@ -115,6 +121,19 @@ void Router::handleOpenDoor(AsyncWebServerRequest *request) {
         return;
     }
     DEBUG_PRINTLN("handleDoorOpen Failed as webcommands currently are not allowed");
+    return request->send(500);
+}
+
+void Router::handleOpenThenShut(AsyncWebServerRequest *request) {
+    DEBUG_PRINTLN("Entering handleOpenThenShut");
+
+    if (!isAuthenticated(request)) return;
+    if (!MotorController::isMoving()) {
+        xTaskCreatePinnedToCore(taskOpenThenClose, "taskOpenThenClose", 4096, NULL, 1, NULL, 1);
+        request->send(200);
+        return;
+    }
+    DEBUG_PRINTLN("handleDoorClose Failed as webcommands currently are not allowed");
     return request->send(500);
 }
 
@@ -143,11 +162,19 @@ void Router::handleAllowStart(AsyncWebServerRequest *request) {
     MotorController::setAllowedToMove(true);
 }
 
+void Router::handleGetManifest(AsyncWebServerRequest *request) {
+    DEBUG_PRINTLN("in HandleGetManifest");
+   
+    String content = MANIFEST_PAGE;
+    request->send(200, "text/manifest+json", content);
+}
+
 void Router::getDoorState(AsyncWebServerRequest *request) {
     if (!isAuthenticated(request)) return;
 
     DoorState State = MotorController::getDoorState();
     String content = "";
+    
     /**
      * All Possible return states:
      * ::DOOROPEN

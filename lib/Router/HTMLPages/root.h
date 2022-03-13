@@ -7,14 +7,18 @@ const char ROOT_PAGE[] PROGMEM = R"=====(
 <head>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
     <meta content="utf-8" http-equiv="encoding">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="manifest" href="/manifest.json">
 </head>
 <body>
     <h2>Welcome to the super secure NayNayBarakay System!</h2><br>
     <div>
         <h3>The Door Is: <span id="doorState"> Reading state...</span></h3>
-        <button onclick="sendPost('/opendoor')">Open The Door</button>
+        <button onclick="sendPost('/openthenshut')">Lift Then Lower</button>
         <br>
-        <button onclick="sendPost('/closedoor')">Close the Door</button>
+        <button onclick="sendPost('/opendoor')">Lift Barricade</button>
+        <br>
+        <button onclick="sendPost('/closedoor')">Lower Barricade</button>
         <br>
         <button onclick="handleStop()">Immediately Stop the Door</button>
         <br>
@@ -37,8 +41,8 @@ const char ROOT_PAGE[] PROGMEM = R"=====(
         }
 
         function handleStop() {
-              document.getElementById("start").style.visibility = "visible";
-              sendPost("/stop");
+            document.getElementById("start").style.visibility = "visible";
+            sendPost("/stop");
         }
 
         function sendPost(endpoint) {
@@ -91,7 +95,7 @@ const char ROOT_PAGE[] PROGMEM = R"=====(
                     break;
             }
         }
-        setInterval(() => updateDoorState(), 1000);
+        setInterval(() => updateDoorState(), 300);
     </script>
     <form action='/login' method='POST'><button name='subject' type='submit' value='DISCONNECT'>Logout</button>
     </form>

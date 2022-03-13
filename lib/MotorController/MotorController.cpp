@@ -124,8 +124,14 @@ DoorState MotorController::checkLimitSwitches() {
 // The barricade Operations will indicate DOORSTATECHANGING, So we should
 // indicate DOOROPENINGFROMINSIDE After, well its waiting for the door
 // to open, then close.
-void MotorController::openDoorFromInside() {
-    DEBUG_PRINTLN("Opening barricade from inside!");
+void MotorController::changeDoorStateAndWaitForDoor() {
+    DEBUG_PRINTLN("in changeDoorStateAndWaitForDoor");
+
+    if (getDoorState() == DoorState::DOOROPEN && isDoorShutWithReed()) {
+        setDoorState(DoorState::DOORCLOSED);
+        return;
+    }
+
     if (!setDoorState(DoorState::DOOROPEN)) return;
     Indicator::indicate(IndicatorState::DOOROPENINGFROMINSIDE);
 
@@ -157,7 +163,7 @@ void MotorController::loop() {
         }
         if (digitalRead(insideDoorOpen) == HIGH) {
             DEBUG_PRINTLN("insideDoorOpen Button Pressed");
-            openDoorFromInside();
+            changeDoorStateAndWaitForDoor();
         }
     }
 }

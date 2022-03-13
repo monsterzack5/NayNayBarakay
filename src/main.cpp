@@ -4,7 +4,7 @@
 /* Enabling and Disabling of logging output is done in Log.h */
 
 /* Comment this out to disable the ability to update via OTA */
-#define OTA_UPLOAD 1
+// #define OTA_UPLOAD 1
 #ifdef OTA_UPLOAD
 #include <ArduinoOTA.h>
 #endif
@@ -114,7 +114,7 @@ void setup() {
     // If woken up from an interrupt, do something based on that interrupt
     switch (Sleeper::interruptWakeupPin()) {
         case insideDoorOpen:
-            MotorController::openDoorFromInside();
+            MotorController::changeDoorStateAndWaitForDoor();
             RTC_WiFiRetriesCount = 0;
             ESP.deepSleep(100);
             break;
@@ -127,10 +127,11 @@ void setup() {
             DEBUG_PRINTLN("interruptWakeupPin Returning unknown state");
             break;
     }
+
     // Check if the ESP can see our network via scanning
     if (WiFiHelper::CanFindOurNetwork()) {
         if (!WiFiHelper::StartLanServer()) {
-            DEBUG_PRINTLN("Found Network Via Scanning But Failed to Connect, Hard rebooting");
+            DEBUG_PRINTLN("Found Network Via Scanning But Failed to Connect, Rebooting!");
             esp_restart();
         }
     } else {
@@ -150,6 +151,8 @@ void setup() {
     server.on("/getdoorstate", HTTP_GET, Router::getDoorState);
     server.on("/allowstart", HTTP_GET | HTTP_POST, Router::handleAllowStart);
     server.on("/stop", HTTP_GET | HTTP_POST, Router::handleStop);
+    server.on("/openthenshut", HTTP_GET | HTTP_POST, Router::handleOpenThenShut);
+    server.on("/manifest.webmanifest", HTTP_GET, Router::handleGetManifest);
     server.onNotFound(Router::handleNotFound);
     server.begin();
 

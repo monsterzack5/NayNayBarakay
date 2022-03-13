@@ -12,10 +12,13 @@ class Router {
     static void handleCloseDoor(AsyncWebServerRequest*);
     static void handleStop(AsyncWebServerRequest*);
     static void handleAllowStart(AsyncWebServerRequest*);
+    static void handleOpenThenShut(AsyncWebServerRequest*);
+    static void handleGetManifest(AsyncWebServerRequest*);
     static void getDoorState(AsyncWebServerRequest*);
 
    private:
     static void taskOpen(void*);
     static void taskClose(void*);
+    static void taskOpenThenClose(void*);
     static bool isAuthenticated(AsyncWebServerRequest*);
 };

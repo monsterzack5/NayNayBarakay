@@ -13,7 +13,7 @@ class MotorController {
     static bool setDoorState(DoorState);
     static DoorState getDoorState();
     static DoorState checkLimitSwitches();
-    static void openDoorFromInside();
+    static void changeDoorStateAndWaitForDoor();
     static bool isDoorShutWithReed();
     static void loop();
     static bool isMoving();
