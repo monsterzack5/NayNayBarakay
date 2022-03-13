@@ -6,7 +6,7 @@
 /* Comment this out to disable the ability to update via OTA */
 // #define OTA_UPLOAD 1
 #ifdef OTA_UPLOAD
-#include <ArduinoOTA.h>
+#    include <ArduinoOTA.h>
 #endif
 
 /* Comment this line out if outsideESPWakeup is a button */
@@ -25,30 +25,30 @@
 #include <esp_sleep.h>
 
 /* __Config__ */
-const char *SSID = "";                                                     // Wifi network name
-const char *PASSWORD = "";                                                 // Wifi network password
-const char *ESP_LOCAL_AP_SSID = "";                                        // Self hosted AP name
-const char *ESP_LOCAL_AP_PASSWORD = "";                                    // Self hosted AP password
-const char *AUTH_LOGIN_USERNAME = "";                                      // Web UI Username
-const char *AUTH_LOGIN_PASSWORD = "";                                      // Web UI Password
-const char *AUTH_COOKIE_NAME = "";                                         // The name of the stored session cookie (ideally random letters)
-const IPAddress ESP_LOCAL_IP(192, 168, 1, 1);                              // IP to connect to in AP mode
-const bool ESP_SHOULD_LOCAL_WIFI_BE_HIDDEN = false;                        // Should the self hosted AP be hidden
-const uint8_t ESP_LOCAL_NETWORK_CHANNEL_ID = 8;                            // Wifi channel the ESP AP will use
-const uint8_t WiFi_TRY_TO_CONNECT_THEN_SLEEP_LIMIT = 3;                    // How many times to sleep then check Wifi
-const uint16_t SLEEPER_SHORT_DEEP_SLEEP_SECONDS = 60;                      // Seconds to wait inbetween Wifi connect retries
-const uint16_t SLEEPER_LONG_DEEP_SLEEP_SECONDS = 3600;                     // If Wifi doesn't connect after X tries, wait this long before retrying
-const uint16_t WIFI_HOW_LONG_TO_HOST_OWN_WIFI_SECONDS = 180;               // Seconds to host own AP from outsideESPWakeup
-const uint16_t WIFI_HOW_OFTEN_TO_CHECK_WIFI_STILL_RUNNING_SECONDS = 120;   // How often the Wifi watchdog checks if the wifi is disconnected
-const uint16_t INDICATOR_SHORT_BLINK_TIME_MS = 200;                        // How long the LED should be lit up for A short blink
-const uint16_t INDICATOR_LONG_BLINK_TIME_MS = 1000;                        // How long the LED should be lit up for A long blink
-const uint16_t INDICATOR_WAIT_BETWEEN_NONIMPORTANT_BLINK_CODES_MS = 5000;  // Wait time between nonimportant codes being blinked (Normal Operation)
-const uint16_t INDICATOR_WAIT_BETWEEN_IMPORTANT_BLINK_CODES_MS = 750;      // Wait time between important codes being blinked (Error's)
+const char* SSID = "";                                                    // Wifi network name
+const char* PASSWORD = "";                                                // Wifi network password
+const char* ESP_LOCAL_AP_SSID = "";                                       // Self hosted AP name
+const char* ESP_LOCAL_AP_PASSWORD = "";                                   // Self hosted AP password
+const char* AUTH_LOGIN_USERNAME = "";                                     // Web UI Username
+const char* AUTH_LOGIN_PASSWORD = "";                                     // Web UI Password
+const char* AUTH_COOKIE_NAME = "";                                        // The name of the stored session cookie (ideally random letters)
+const IPAddress ESP_LOCAL_IP(192, 168, 1, 1);                             // IP to connect to in AP mode
+const bool ESP_SHOULD_LOCAL_WIFI_BE_HIDDEN = false;                       // Should the self hosted AP be hidden
+const uint8_t ESP_LOCAL_NETWORK_CHANNEL_ID = 8;                           // Wifi channel the ESP AP will use
+const uint8_t WiFi_TRY_TO_CONNECT_THEN_SLEEP_LIMIT = 3;                   // How many times to sleep then check Wifi
+const uint16_t SLEEPER_SHORT_DEEP_SLEEP_SECONDS = 60;                     // Seconds to wait inbetween Wifi connect retries
+const uint16_t SLEEPER_LONG_DEEP_SLEEP_SECONDS = 3600;                    // If Wifi doesn't connect after X tries, wait this long before retrying
+const uint16_t WIFI_HOW_LONG_TO_HOST_OWN_WIFI_SECONDS = 180;              // Seconds to host own AP from outsideESPWakeup
+const uint16_t WIFI_HOW_OFTEN_TO_CHECK_WIFI_STILL_RUNNING_SECONDS = 120;  // How often the Wifi watchdog checks if the wifi is disconnected
+const uint16_t INDICATOR_SHORT_BLINK_TIME_MS = 200;                       // How long the LED should be lit up for A short blink
+const uint16_t INDICATOR_LONG_BLINK_TIME_MS = 1000;                       // How long the LED should be lit up for A long blink
+const uint16_t INDICATOR_WAIT_BETWEEN_NONIMPORTANT_BLINK_CODES_MS = 5000; // Wait time between nonimportant codes being blinked (Normal Operation)
+const uint16_t INDICATOR_WAIT_BETWEEN_IMPORTANT_BLINK_CODES_MS = 750;     // Wait time between important codes being blinked (Error's)
 
 #ifdef OTA_UPLOAD
-const uint16_t ARDUINO_OTA_PORT = 3232;  // Arduino OTA Port (3232 is the standard default)
-const char *ARDUINO_OTA_PASSWORD = "";   // Arduino OTA Password
-const char *ARDUINO_OTA_HOSTNAME = "";   // Arduino OTA Hostname
+const uint16_t ARDUINO_OTA_PORT = 3232; // Arduino OTA Port (3232 is the standard default)
+const char* ARDUINO_OTA_PASSWORD = "";  // Arduino OTA Password
+const char* ARDUINO_OTA_HOSTNAME = "";  // Arduino OTA Hostname
 #endif
 
 #ifdef OUTSIDEESPWAKEUPISTOUCH
@@ -69,7 +69,7 @@ const uint8_t hBridgeClose = 33;
 const uint8_t indicatorPin = 21;
 
 // Inputs
-/* 
+/*
     Don't Forget Interupts Need To Be On RTC_GPIO Pins
     And outsideESPWakeup needs to be on a Touch GPIO Pin
     if You're using it as a touch button.
@@ -80,7 +80,8 @@ const uint8_t limitSwitchOpen = 22;
 const uint8_t limitSwitchClose = 23;
 const uint8_t doorReedSwitch = 14;
 
-void setup() {
+void setup()
+{
     delay(100);
 
     pinMode(hBridgeOpen, OUTPUT);
@@ -113,19 +114,19 @@ void setup() {
 
     // If woken up from an interrupt, do something based on that interrupt
     switch (Sleeper::interruptWakeupPin()) {
-        case insideDoorOpen:
-            MotorController::changeDoorStateAndWaitForDoor();
-            RTC_WiFiRetriesCount = 0;
-            ESP.deepSleep(100);
-            break;
-        case outsideESPWakeup:
-            RTC_ShouldHostOwnNetwork = true;
-            break;
-        case 0:
-            break;
-        default:
-            DEBUG_PRINTLN("interruptWakeupPin Returning unknown state");
-            break;
+    case insideDoorOpen:
+        MotorController::changeDoorStateAndWaitForDoor();
+        RTC_WiFiRetriesCount = 0;
+        ESP.deepSleep(100);
+        break;
+    case outsideESPWakeup:
+        RTC_ShouldHostOwnNetwork = true;
+        break;
+    case 0:
+        break;
+    default:
+        DEBUG_PRINTLN("interruptWakeupPin Returning unknown state");
+        break;
     }
 
     // Check if the ESP can see our network via scanning
@@ -166,7 +167,7 @@ void setup() {
             String type;
             if (ArduinoOTA.getCommand() == U_FLASH)
                 type = "sketch";
-            else  // U_SPIFFS
+            else // U_SPIFFS
                 type = "filesystem";
 
             // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
@@ -198,7 +199,8 @@ void setup() {
     MotorController::init();
 }
 
-void loop() {
+void loop()
+{
     MotorController::loop();
 #ifdef OTA_UPLOAD
     ArduinoOTA.handle();

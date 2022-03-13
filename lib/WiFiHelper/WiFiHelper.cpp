@@ -9,7 +9,8 @@
 #include <WiFiHelper.h>
 #include <esp_wifi.h>
 
-bool WiFiHelper::CanFindOurNetwork() {
+bool WiFiHelper::CanFindOurNetwork()
+{
     // if there's more than 65,535 networks available, then something's _very_ wrong
     uint16_t numOfFoundNetworks = WiFi.scanNetworks();
     for (uint16_t i = 0; i < numOfFoundNetworks; i++) {
@@ -20,7 +21,8 @@ bool WiFiHelper::CanFindOurNetwork() {
     return false;
 }
 
-bool WiFiHelper::StartLanServer() {
+bool WiFiHelper::StartLanServer()
+{
     DEBUG_PRINTLN("Trying to Connect to Lan Server");
     uint8_t wifiConnectionAttemps = 0;
     WiFi.disconnect(true);
@@ -52,12 +54,13 @@ bool WiFiHelper::StartLanServer() {
     return true;
 }
 
-bool WiFiHelper::StartLocalServer() {
+bool WiFiHelper::StartLocalServer()
+{
     DEBUG_PRINTLN("Trying to Create Local Server");
     startLocalWiFiResetTimer();
     WiFi.mode(WIFI_AP);
     WiFi.softAP(ESP_LOCAL_AP_SSID, ESP_LOCAL_AP_PASSWORD,
-                ESP_LOCAL_NETWORK_CHANNEL_ID, ESP_SHOULD_LOCAL_WIFI_BE_HIDDEN);
+        ESP_LOCAL_NETWORK_CHANNEL_ID, ESP_SHOULD_LOCAL_WIFI_BE_HIDDEN);
     vTaskDelay(2000 / portTICK_PERIOD_MS);
     //                local_ip (set in main.ino)  Gateway                    Subnet
     WiFi.softAPConfig(ESP_LOCAL_IP, IPAddress(192, 168, 1, 1), IPAddress(255, 255, 255, 0));
@@ -69,29 +72,33 @@ bool WiFiHelper::StartLocalServer() {
     return true;
 }
 
-void WiFiHelper::StopLocalServer(void* arg) {
+void WiFiHelper::StopLocalServer(void* arg)
+{
     if (MotorController::isDoorShutWithReed()) {
         DEBUG_PRINTLN("Gonna Stop hosting our own network and sleep now, nighty night");
         RTC_ShouldHostOwnNetwork = false;
         ESP.deepSleep(100);
-        return;  // this line is never reached
+        return; // this line is never reached
     }
     DEBUG_PRINTLN("Tried to turn off local wifi and go to sleep but the door is still open");
 }
 
-void WiFiHelper::reconnectToWifi_task(void* arg) {
+void WiFiHelper::reconnectToWifi_task(void* arg)
+{
     DEBUG_PRINTLN("Restarting ESP in reconnectToWiFi_task");
     esp_restart();
 }
 
-void WiFiHelper::reconnectToWifi(void* arg) {
+void WiFiHelper::reconnectToWifi(void* arg)
+{
     if (WiFi.status() != WL_CONNECTED) {
         DEBUG_PRINTLN("Wifi Watchdog reported wifi disconnected, rebooting");
         xTaskCreatePinnedToCore(reconnectToWifi_task, "reconnectToWifi_task", 1000, NULL, 1, NULL, 1);
     }
 }
 
-void WiFiHelper::startLanWiFiWatchdog() {
+void WiFiHelper::startLanWiFiWatchdog()
+{
     const esp_timer_create_args_t wifiWatchdogTimer_args = {
         .callback = &reconnectToWifi,
     };
@@ -100,7 +107,8 @@ void WiFiHelper::startLanWiFiWatchdog() {
     esp_timer_start_periodic(wifiWatchdogTimer, WIFI_HOW_OFTEN_TO_CHECK_WIFI_STILL_RUNNING_SECONDS * S_TO_uSECONDS);
 }
 
-void WiFiHelper::startLocalWiFiResetTimer() {
+void WiFiHelper::startLocalWiFiResetTimer()
+{
     const esp_timer_create_args_t disableLocalWiFiTimer_args = {
         .callback = &StopLocalServer,
     };

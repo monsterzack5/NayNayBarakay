@@ -18,7 +18,8 @@ bool MotorController::m_allowed_to_move = true;
 // Used to know if the barricade is Opening/Closing/Floating
 DoorState MotorController::m_state = DoorState::DOORFLOATING;
 
-void MotorController::init() {
+void MotorController::init()
+{
     DEBUG_PRINTLN("MotorController::init()");
 
     if (m_limit_switch_close.getState() == ButtonState::OPEN && m_limit_switch_open.getState() == ButtonState::OPEN) {
@@ -29,7 +30,8 @@ void MotorController::init() {
     }
 }
 
-bool MotorController::setDoorState(DoorState newState) {
+bool MotorController::setDoorState(DoorState newState)
+{
     if (newState != DoorState::DOOROPEN && newState != DoorState::DOORCLOSED) {
         DEBUG_PRINTLN("MotorController::setDoorState called with an invaild new state");
         return false;
@@ -102,7 +104,8 @@ bool MotorController::setDoorState(DoorState newState) {
 }
 
 /* This function will only ever return the KNOWN status of the barricade via the limit switches */
-DoorState MotorController::checkLimitSwitches() {
+DoorState MotorController::checkLimitSwitches()
+{
     if (m_limit_switch_close.getState() == ButtonState::OPEN && m_limit_switch_open.getState() == ButtonState::PRESSED) {
         return DoorState::DOOROPEN;
     }
@@ -124,7 +127,8 @@ DoorState MotorController::checkLimitSwitches() {
 // The barricade Operations will indicate DOORSTATECHANGING, So we should
 // indicate DOOROPENINGFROMINSIDE After, well its waiting for the door
 // to open, then close.
-void MotorController::changeDoorStateAndWaitForDoor() {
+void MotorController::changeDoorStateAndWaitForDoor()
+{
     DEBUG_PRINTLN("in changeDoorStateAndWaitForDoor");
 
     if (getDoorState() == DoorState::DOOROPEN && isDoorShutWithReed()) {
@@ -132,7 +136,8 @@ void MotorController::changeDoorStateAndWaitForDoor() {
         return;
     }
 
-    if (!setDoorState(DoorState::DOOROPEN)) return;
+    if (!setDoorState(DoorState::DOOROPEN))
+        return;
     Indicator::indicate(IndicatorState::DOOROPENINGFROMINSIDE);
 
     // wait for the reed switch to say the barricade is open
@@ -149,12 +154,14 @@ void MotorController::changeDoorStateAndWaitForDoor() {
     // Wait 1 second, then close the door
     delay(1000);
 
-    if (!setDoorState(DoorState::DOORCLOSED)) return;
+    if (!setDoorState(DoorState::DOORCLOSED))
+        return;
 }
 
 // We Loop this function on every single cycle, so we always
 // can known the current state of the limit switches
-void MotorController::loop() {
+void MotorController::loop()
+{
     // if we're moving, state is being handled elsewhere
     if (!m_is_moving) {
         DoorState status = checkLimitSwitches();
@@ -168,37 +175,44 @@ void MotorController::loop() {
     }
 }
 
-IndicatorState MotorController::getWhatToIndicateAfterDoorOP() {
+IndicatorState MotorController::getWhatToIndicateAfterDoorOP()
+{
     switch (WiFi.getMode()) {
-        case WIFI_MODE_AP:
-            return IndicatorState::HOSTINGOWNWIFI;
-        case WIFI_MODE_STA:
-            return IndicatorState::NORMALOPERATION;
-        default:
-            return IndicatorState::NONE;
+    case WIFI_MODE_AP:
+        return IndicatorState::HOSTINGOWNWIFI;
+    case WIFI_MODE_STA:
+        return IndicatorState::NORMALOPERATION;
+    default:
+        return IndicatorState::NONE;
     }
 }
 
-void MotorController::indicateDoorError() {
+void MotorController::indicateDoorError()
+{
     Indicator::indicateForThenIndicate(IndicatorState::DOORERROR, 5000, getWhatToIndicateAfterDoorOP());
 }
 
-DoorState MotorController::getDoorState() {
+DoorState MotorController::getDoorState()
+{
     return m_state;
 }
 
-bool MotorController::isDoorShutWithReed() {
+bool MotorController::isDoorShutWithReed()
+{
     return digitalRead(doorReedSwitch) == LOW;
 }
 
-bool MotorController::isMoving() {
+bool MotorController::isMoving()
+{
     return m_is_moving;
 }
 
-void MotorController::setAllowedToMove(bool value) {
+void MotorController::setAllowedToMove(bool value)
+{
     m_allowed_to_move = value;
 }
 
-bool MotorController::isAllowedToMove() {
+bool MotorController::isAllowedToMove()
+{
     return m_allowed_to_move;
 }

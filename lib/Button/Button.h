@@ -4,13 +4,13 @@
 #include <ButtonState.h>
 
 class Button {
-   public:
+public:
     Button(uint8_t pin, uint16_t debounceSeconds);
     void setDebounce(uint16_t);
     uint16_t getDebounce();
     virtual ButtonState getState();
 
-   private:
+private:
     uint8_t m_pin;
     uint16_t m_debounce;
     ButtonState m_state;

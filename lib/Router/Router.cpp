@@ -4,10 +4,11 @@
 #include <Router.h>
 
 #include "HTMLPages/login_page.h"
-#include "HTMLPages/root.h"
 #include "HTMLPages/manifest.h"
+#include "HTMLPages/root.h"
 
-bool Router::isAuthenticated(AsyncWebServerRequest *request) {
+bool Router::isAuthenticated(AsyncWebServerRequest* request)
+{
     // DEBUG_PRINTLN("Enter isAuthenticated");
 
     if (request->hasHeader("Cookie")) {
@@ -17,26 +18,30 @@ bool Router::isAuthenticated(AsyncWebServerRequest *request) {
         }
     }
     DEBUG_PRINTLN("User is not currently Authenticated");
-    AsyncWebServerResponse *response = request->beginResponse(301);
+    AsyncWebServerResponse* response = request->beginResponse(301);
     response->addHeader("Location", "/login");
     response->addHeader("Cache-Control", "no-cache");
     request->send(response);
     return false;
 }
 
-void Router::handleRoot(AsyncWebServerRequest *request) {
+void Router::handleRoot(AsyncWebServerRequest* request)
+{
     DEBUG_PRINTLN("Enter handleRoot");
 
-    if (!isAuthenticated(request)) return;
+    if (!isAuthenticated(request))
+        return;
 
     String content = ROOT_PAGE;
     request->send(200, "text/html", content);
 }
 
-void Router::handleNotFound(AsyncWebServerRequest *request) {
+void Router::handleNotFound(AsyncWebServerRequest* request)
+{
     DEBUG_PRINTLN("Enter handleNotFound");
 
-    if (!isAuthenticated(request)) return;
+    if (!isAuthenticated(request))
+        return;
 
     String page = "Page Not Found\n\n";
     page += "URI: ";
@@ -48,10 +53,11 @@ void Router::handleNotFound(AsyncWebServerRequest *request) {
     request->send(404, "text/plain", page);
 }
 
-void Router::handleLoginPost(AsyncWebServerRequest *request) {
+void Router::handleLoginPost(AsyncWebServerRequest* request)
+{
     DEBUG_PRINTLN("Enter handleLoginPost");
 
-    AsyncWebServerResponse *response = request->beginResponse(200);
+    AsyncWebServerResponse* response = request->beginResponse(200);
 
     // Check the args to see if this request is a Disconnect request
     /* I tried using hasArg() for this, but I have NO IDEA why it doesnt work*/
@@ -76,7 +82,7 @@ void Router::handleLoginPost(AsyncWebServerRequest *request) {
 
         if (request->arg("USERNAME") == AUTH_LOGIN_USERNAME && request->arg("PASSWORD") == AUTH_LOGIN_PASSWORD) {
             DEBUG_PRINTLN("handleLoginPost: User Entered the Correct AuthString");
-            AsyncWebServerResponse *response = request->beginResponse(301);
+            AsyncWebServerResponse* response = request->beginResponse(301);
             response->addHeader("Location", "/");
             response->addHeader("Cache-Control", "no-cache");
             response->addHeader("Set-Cookie", AUTH_COOKIE_NAME);
@@ -89,31 +95,37 @@ void Router::handleLoginPost(AsyncWebServerRequest *request) {
     }
 }
 
-void Router::handleLoginGet(AsyncWebServerRequest *request) {
+void Router::handleLoginGet(AsyncWebServerRequest* request)
+{
     DEBUG_PRINTLN("Enter handleLoginGet");
 
     request->send(200, "text/html", LOGIN_PAGE);
 }
 
-void Router::taskOpen(void *param) {
+void Router::taskOpen(void* param)
+{
     MotorController::setDoorState(DoorState::DOOROPEN);
     vTaskDelete(NULL);
 }
 
-void Router::taskClose(void *param) {
+void Router::taskClose(void* param)
+{
     MotorController::setDoorState(DoorState::DOORCLOSED);
     vTaskDelete(NULL);
 }
 
-void Router::taskOpenThenClose(void *param) {
+void Router::taskOpenThenClose(void* param)
+{
     MotorController::changeDoorStateAndWaitForDoor();
     vTaskDelete(NULL);
 }
 
-void Router::handleOpenDoor(AsyncWebServerRequest *request) {
+void Router::handleOpenDoor(AsyncWebServerRequest* request)
+{
     DEBUG_PRINTLN("Enter handleDoorOpen");
 
-    if (!isAuthenticated(request)) return;
+    if (!isAuthenticated(request))
+        return;
 
     if (!MotorController::isMoving()) {
         request->send(200);
@@ -124,10 +136,12 @@ void Router::handleOpenDoor(AsyncWebServerRequest *request) {
     return request->send(500);
 }
 
-void Router::handleOpenThenShut(AsyncWebServerRequest *request) {
+void Router::handleOpenThenShut(AsyncWebServerRequest* request)
+{
     DEBUG_PRINTLN("Entering handleOpenThenShut");
 
-    if (!isAuthenticated(request)) return;
+    if (!isAuthenticated(request))
+        return;
     if (!MotorController::isMoving()) {
         xTaskCreatePinnedToCore(taskOpenThenClose, "taskOpenThenClose", 4096, NULL, 1, NULL, 1);
         request->send(200);
@@ -137,10 +151,12 @@ void Router::handleOpenThenShut(AsyncWebServerRequest *request) {
     return request->send(500);
 }
 
-void Router::handleCloseDoor(AsyncWebServerRequest *request) {
+void Router::handleCloseDoor(AsyncWebServerRequest* request)
+{
     DEBUG_PRINTLN("Entering handleDoorClose");
 
-    if (!isAuthenticated(request)) return;
+    if (!isAuthenticated(request))
+        return;
 
     if (!MotorController::isMoving()) {
         xTaskCreatePinnedToCore(taskClose, "taskClose", 4096, NULL, 1, NULL, 1);
@@ -151,39 +167,46 @@ void Router::handleCloseDoor(AsyncWebServerRequest *request) {
     return request->send(500);
 }
 
-void Router::handleStop(AsyncWebServerRequest *request) {
-    if (!isAuthenticated(request)) return;
+void Router::handleStop(AsyncWebServerRequest* request)
+{
+    if (!isAuthenticated(request))
+        return;
 
     MotorController::setAllowedToMove(false);
 }
 
-void Router::handleAllowStart(AsyncWebServerRequest *request) {
-    if (!isAuthenticated(request)) return;
+void Router::handleAllowStart(AsyncWebServerRequest* request)
+{
+    if (!isAuthenticated(request))
+        return;
     MotorController::setAllowedToMove(true);
 }
 
-void Router::handleGetManifest(AsyncWebServerRequest *request) {
+void Router::handleGetManifest(AsyncWebServerRequest* request)
+{
     DEBUG_PRINTLN("in HandleGetManifest");
-   
+
     String content = MANIFEST_PAGE;
     request->send(200, "text/manifest+json", content);
 }
 
-void Router::getDoorState(AsyncWebServerRequest *request) {
-    if (!isAuthenticated(request)) return;
+void Router::getDoorState(AsyncWebServerRequest* request)
+{
+    if (!isAuthenticated(request))
+        return;
 
     DoorState State = MotorController::getDoorState();
     String content = "";
-    
+
     /**
      * All Possible return states:
      * ::DOOROPEN
      * ::DOOROPENING
-     * ::DOORCLOSED 
+     * ::DOORCLOSED
      * ::DOORCLOSING
      * ::DOORFLOATING
      * ::DOORERROR
-     * 
+     *
      * Example end result string:
      *  { "status": "DOOROPEN", "isMoving": true, "allowedToMove": true }
      */

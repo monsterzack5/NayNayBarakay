@@ -3,13 +3,13 @@
 #include <IndicatorState.h>
 
 class Indicator {
-   public:
+public:
     static void init();
     static void indicate(IndicatorState);
     static void indicateForThenIndicate(IndicatorState state, uint16_t showStateForMS, IndicatorState newState);
     static void stopIndicating();
 
-   private:
+private:
     static void createNewTask(TaskFunction_t);
     static TaskFunction_t getTaskFromIndiactorState(IndicatorState);
     static TaskHandle_t m_task_handler;

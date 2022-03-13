@@ -1,12 +1,12 @@
 #pragma once
 
 class WiFiHelper {
-   public:
+public:
     static bool CanFindOurNetwork();
     static bool StartLanServer();
     static bool StartLocalServer();
 
-   private:
+private:
     static void startLanWiFiWatchdog();
     static void startLocalWiFiResetTimer();
     static void StopLocalServer(void*);

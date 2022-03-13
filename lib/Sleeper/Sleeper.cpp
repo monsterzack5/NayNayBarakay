@@ -5,7 +5,8 @@
 #include <WiFi.h>
 #include <WiFiHelper.h>
 
-void Sleeper::checkWiFiLoop() {
+void Sleeper::checkWiFiLoop()
+{
     if (RTC_WiFiRetriesCount > WiFi_TRY_TO_CONNECT_THEN_SLEEP_LIMIT) {
         DEBUG_PRINTLN("Exhausted retries, Going into long Deep Sleep");
         RTC_WiFiRetriesCount = 0;
@@ -18,11 +19,13 @@ void Sleeper::checkWiFiLoop() {
     deepSleepSeconds(SLEEPER_SHORT_DEEP_SLEEP_SECONDS);
 }
 
-void Sleeper::deepSleepSeconds(uint16_t sleep_time) {
+void Sleeper::deepSleepSeconds(uint16_t sleep_time)
+{
     ESP.deepSleep(sleep_time * S_TO_uSECONDS);
 }
 
-uint8_t Sleeper::interruptWakeupPin() {
+uint8_t Sleeper::interruptWakeupPin()
+{
     uint64_t wakeupBit = esp_sleep_get_ext1_wakeup_status();
     if (wakeupBit & (1LL << insideDoorOpen)) {
         DEBUG_PRINTLN("Woken up using insideDoorOpen");

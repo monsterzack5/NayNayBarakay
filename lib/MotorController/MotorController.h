@@ -6,7 +6,7 @@
 #include <IndicatorState.h>
 
 class MotorController {
-   public:
+public:
     static void init();
     // static bool openDoor();
     // static bool closeDoor();
@@ -21,7 +21,7 @@ class MotorController {
     static void setAllowedToMove(bool);
     static void indicateDoorError();
 
-   private:
+private:
     static IndicatorState getWhatToIndicateAfterDoorOP();
     static Button m_limit_switch_open;
     static Button m_limit_switch_close;

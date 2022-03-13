@@ -3,7 +3,7 @@
 #include <ESPAsyncWebServer.h>
 
 class Router {
-   public:
+public:
     static void handleRoot(AsyncWebServerRequest*);
     static void handleNotFound(AsyncWebServerRequest*);
     static void handleLoginPost(AsyncWebServerRequest*);
@@ -16,7 +16,7 @@ class Router {
     static void handleGetManifest(AsyncWebServerRequest*);
     static void getDoorState(AsyncWebServerRequest*);
 
-   private:
+private:
     static void taskOpen(void*);
     static void taskClose(void*);
     static void taskOpenThenClose(void*);
